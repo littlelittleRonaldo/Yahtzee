@@ -1,0 +1,55 @@
+<!--pages/index.wxml-->
+<view class="page__desc">快艇骰子</view>
+<view>
+  <mp-row>
+    <mp-col span="{{6}}">
+      <view>回合数 1/12</view>
+      <view>一点</view>
+      <view>二点</view>
+      <view>三点</view>
+      <view>四点</view>
+      <view>五点</view>
+      <view>六点</view>
+      <view>小计</view>
+      <view>奖励分 +35</view>
+      <view>全选</view>
+      <view>四骰同花</view>
+      <view>葫芦</view>
+      <view>小顺</view>
+      <view>大顺</view>
+      <view>快艇</view>
+      <view>总计点数</view>
+    </mp-col>
+    <view>
+      <mp-col span="{{6}}" wx:for="{{scoreList}}" wx:key="index">
+      <view>{{item.name}}</view>
+      <view class="{{index==curIndex&&activeNum==1 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="1" >{{item.one}}</view>
+      <view class="{{index==curIndex&&activeNum==2 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="2" >{{item.two}}</view>
+      <view class="{{index==curIndex&&activeNum==3 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="3" >{{item.three}}</view>
+      <view class="{{index==curIndex&&activeNum==4 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="4" >{{item.four}}</view>
+      <view class="{{index==curIndex&&activeNum==5 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="5" >{{item.five}}</view>
+      <view class="{{index==curIndex&&activeNum==6 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="6" >{{item.six}}</view>
+      <view>{{item.littleSum}}/63</view>
+      <view>{{item.rewards}}</view>
+      <view class="{{index==curIndex&&activeNum==7 ?'active':''}}" data-num="7" bindtap="countSame" data-index="{{index}}" data-prop="allSelect">{{item.allSelect}}</view>
+      <view class="{{index==curIndex&&activeNum==8 ?'active':''}}" data-num="8" bindtap="countSame" data-index="{{index}}" data-prop="fourSame">{{item.fourSame}}</view>
+      <view class="{{index==curIndex&&activeNum==9 ?'active':''}}" data-num="9" bindtap="countSame" data-index="{{index}}" data-prop="gourd">{{item.gourd}}</view>
+      <view class="{{index==curIndex&&activeNum==10 ?'active':''}}" data-num="10" bindtap="judgeStraight" data-index="{{index}}" data-prop="miniStraight">{{item.miniStraight}}</view>
+      <view class="{{index==curIndex&&activeNum==11 ?'active':''}}" data-num="11" bindtap="judgeStraight" data-index="{{index}}" data-prop="bigStraight">{{item.bigStraight}}</view>
+      <view class="{{index==curIndex&&activeNum==12 ?'active':''}}" data-num="12" bindtap="countSame" data-index="{{index}}" data-prop="yahtzee">{{item.yahtzee}}</view>
+      <view>{{item.totalScore}}</view>
+    </mp-col>
+    </view>
+  </mp-row>
+</view>
+<view class="section">
+  <picker mode="multiSelector" bindchange="bindMultiPickerChange" bindcancel=""
+    value="{{multiIndex}}" range="{{multiArray}}">
+    <view class="picker">
+      当前点数：{{multiArray[0][multiIndex[0]]}}，{{multiArray[1][multiIndex[1]]}}，{{multiArray[2][multiIndex[2]]}}，{{multiArray[0][multiIndex[3]]}}，{{multiArray[0][multiIndex[4]]}}
+    </view>
+  </picker>
+</view>
+<view class="reset">
+  <button bindtap="reset">重置</button>
+</view>

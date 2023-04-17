@@ -1,0 +1,21 @@
+/* pages/index.wxss */
+page {
+  text-align: center;
+}
+.page__desc {
+  font-size: 60rpx;
+}
+.dice-points {
+  display: inline-block;
+  width: 200rpx;
+  padding-top: 20rpx;
+}
+.active {
+  border: 1px solid yellowgreen;
+}
+.section {
+  margin-top: 30rpx;
+}
+.reset {
+  margin-top: 50rpx;
+}
