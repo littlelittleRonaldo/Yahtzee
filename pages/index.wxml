@@ -46,7 +46,7 @@
   <picker mode="multiSelector" bindchange="bindMultiPickerChange" bindcancel=""
     value="{{multiIndex}}" range="{{multiArray}}">
     <view class="picker">
-      当前点数：{{multiArray[0][multiIndex[0]]}}，{{multiArray[1][multiIndex[1]]}}，{{multiArray[2][multiIndex[2]]}}，{{multiArray[0][multiIndex[3]]}}，{{multiArray[0][multiIndex[4]]}}
+      输入骰子点数：{{multiArray[0][multiIndex[0]]}}，{{multiArray[1][multiIndex[1]]}}，{{multiArray[2][multiIndex[2]]}}，{{multiArray[0][multiIndex[3]]}}，{{multiArray[0][multiIndex[4]]}}
     </view>
   </picker>
 </view>

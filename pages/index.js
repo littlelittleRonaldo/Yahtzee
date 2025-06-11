@@ -187,7 +187,6 @@ Page({
         maxName = ite
       }
     }
-    console.log("出现次数最多的是：" + maxName + ",出现的次数为：" + maxNum)
     return maxNum
   },
   // 点数累加
@@ -268,6 +267,7 @@ Page({
             [propName]: 0
           })
         }
+        this.countTotal(this.data.scoreList[index],index)
         break;
       default:
         this.allSum(index,'allSelect',true)
