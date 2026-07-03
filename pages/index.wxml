@@ -1,55 +1,148 @@
 <!--pages/index.wxml-->
-<view class="page__desc">快艇骰子</view>
-<view>
-  <mp-row>
-    <mp-col span="{{6}}">
-      <view>回合数 1/12</view>
-      <view>一点</view>
-      <view>二点</view>
-      <view>三点</view>
-      <view>四点</view>
-      <view>五点</view>
-      <view>六点</view>
-      <view>小计</view>
-      <view>奖励分 +35</view>
-      <view>全选</view>
-      <view>四骰同花</view>
-      <view>葫芦</view>
-      <view>小顺</view>
-      <view>大顺</view>
-      <view>快艇</view>
-      <view>总计点数</view>
-    </mp-col>
-    <view>
-      <mp-col span="{{6}}" wx:for="{{scoreList}}" wx:key="index">
-      <view>{{item.name}}</view>
-      <view class="{{index==curIndex&&activeNum==1 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="1" >{{item.one}}</view>
-      <view class="{{index==curIndex&&activeNum==2 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="2" >{{item.two}}</view>
-      <view class="{{index==curIndex&&activeNum==3 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="3" >{{item.three}}</view>
-      <view class="{{index==curIndex&&activeNum==4 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="4" >{{item.four}}</view>
-      <view class="{{index==curIndex&&activeNum==5 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="5" >{{item.five}}</view>
-      <view class="{{index==curIndex&&activeNum==6 ?'active':''}}" bindtap="numSum" data-index="{{index}}" data-num="6" >{{item.six}}</view>
-      <view>{{item.littleSum}}/63</view>
-      <view>{{item.rewards}}</view>
-      <view class="{{index==curIndex&&activeNum==7 ?'active':''}}" data-num="7" bindtap="countSame" data-index="{{index}}" data-prop="allSelect">{{item.allSelect}}</view>
-      <view class="{{index==curIndex&&activeNum==8 ?'active':''}}" data-num="8" bindtap="countSame" data-index="{{index}}" data-prop="fourSame">{{item.fourSame}}</view>
-      <view class="{{index==curIndex&&activeNum==9 ?'active':''}}" data-num="9" bindtap="countSame" data-index="{{index}}" data-prop="gourd">{{item.gourd}}</view>
-      <view class="{{index==curIndex&&activeNum==10 ?'active':''}}" data-num="10" bindtap="judgeStraight" data-index="{{index}}" data-prop="miniStraight">{{item.miniStraight}}</view>
-      <view class="{{index==curIndex&&activeNum==11 ?'active':''}}" data-num="11" bindtap="judgeStraight" data-index="{{index}}" data-prop="bigStraight">{{item.bigStraight}}</view>
-      <view class="{{index==curIndex&&activeNum==12 ?'active':''}}" data-num="12" bindtap="countSame" data-index="{{index}}" data-prop="yahtzee">{{item.yahtzee}}</view>
-      <view>{{item.totalScore}}</view>
-    </mp-col>
+<view class="page">
+  <view class="hero-card">
+    <view class="page__desc">🎲 快艇骰子</view>
+    <view class="page__subtitle">选择骰子点数，轻松记录每一轮的得分</view>
+  </view>
+
+  <view class="table-card">
+    <scroll-view class="table-scroll" scroll-x="true">
+      <view class="score-table">
+        <view class="table-row table-row--header">
+          <view class="label-cell header-label">项目</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="player-cell {{index==currentPlayer ? 'player-current' : ''}}">{{item.name}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">第{{roundNumber}}轮 / {{totalRounds}}</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell score-cell--static">-</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">一点</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==1 ?'active':''}} {{item.oneConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" bindtap="numSum" data-index="{{index}}" data-num="1">{{item.one}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">二点</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==2 ?'active':''}} {{item.twoConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" bindtap="numSum" data-index="{{index}}" data-num="2">{{item.two}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">三点</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==3 ?'active':''}} {{item.threeConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" bindtap="numSum" data-index="{{index}}" data-num="3">{{item.three}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">四点</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==4 ?'active':''}} {{item.fourConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" bindtap="numSum" data-index="{{index}}" data-num="4">{{item.four}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">五点</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==5 ?'active':''}} {{item.fiveConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" bindtap="numSum" data-index="{{index}}" data-num="5">{{item.five}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">六点</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==6 ?'active':''}} {{item.sixConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" bindtap="numSum" data-index="{{index}}" data-num="6">{{item.six}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">小计</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell score-cell--static {{index==currentPlayer ? 'player-current' : ''}}">{{item.littleSum}}/63</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">奖励分 +35</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell score-cell--static {{index==currentPlayer ? 'player-current' : ''}}">{{item.rewards}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">全选</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==7 ?'active':''}} {{item.allSelectConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" data-num="7" bindtap="countSame" data-index="{{index}}" data-prop="allSelect">{{item.allSelect}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">四骰同花</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==8 ?'active':''}} {{item.fourSameConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" data-num="8" bindtap="countSame" data-index="{{index}}" data-prop="fourSame">{{item.fourSame}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">葫芦</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==9 ?'active':''}} {{item.gourdConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" data-num="9" bindtap="countSame" data-index="{{index}}" data-prop="gourd">{{item.gourd}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">小顺</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==10 ?'active':''}} {{item.miniStraightConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" data-num="10" bindtap="judgeStraight" data-index="{{index}}" data-prop="miniStraight">{{item.miniStraight}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">大顺</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==11 ?'active':''}} {{item.bigStraightConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" data-num="11" bindtap="judgeStraight" data-index="{{index}}" data-prop="bigStraight">{{item.bigStraight}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">快艇</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell {{index==curIndex&&activeNum==12 ?'active':''}} {{item.yahtzeeConfirmed ? 'confirmed' : ''}} {{index==currentPlayer ? 'player-current' : ''}}" data-num="12" bindtap="countSame" data-index="{{index}}" data-prop="yahtzee">{{item.yahtzee}}</view>
+          </block>
+        </view>
+
+        <view class="table-row">
+          <view class="label-cell">总计点数</view>
+          <block wx:for="{{scoreList}}" wx:key="index">
+            <view class="score-cell score-cell--static {{index==currentPlayer ? 'player-current' : ''}}">{{item.totalScore}}</view>
+          </block>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="section">
+    <view class="dice-panel">
+      <view class="dice-list">
+        <view wx:for="{{diceList}}" wx:key="index" class="dice-item {{rolling ? 'dice-rolling' : ''}}">
+          {{item}}
+        </view>
+      </view>
+      <view class="hint-box">{{hintMessage}}</view>
+      <button class="roll-btn" bindtap="rollDice" loading="{{rolling}}">{{rolling ? '掷骰中...' : '投掷骰子'}}</button>
     </view>
-  </mp-row>
-</view>
-<view class="section">
-  <picker mode="multiSelector" bindchange="bindMultiPickerChange" bindcancel=""
-    value="{{multiIndex}}" range="{{multiArray}}">
-    <view class="picker">
-      输入骰子点数：{{multiArray[0][multiIndex[0]]}}，{{multiArray[1][multiIndex[1]]}}，{{multiArray[2][multiIndex[2]]}}，{{multiArray[0][multiIndex[3]]}}，{{multiArray[0][multiIndex[4]]}}
-    </view>
-  </picker>
-</view>
-<view class="reset">
-  <button bindtap="reset">重置</button>
+  </view>
+
+  <view class="reset">
+    <button class="reset-btn" bindtap="reset">重置</button>
+  </view>
 </view>

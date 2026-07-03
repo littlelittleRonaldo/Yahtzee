@@ -29,7 +29,19 @@ Page({
         miniStraight: 0,
         bigStraight: 0,
         yahtzee: 0,
-        totalScore: 0
+        totalScore: 0,
+        oneConfirmed: false,
+        twoConfirmed: false,
+        threeConfirmed: false,
+        fourConfirmed: false,
+        fiveConfirmed: false,
+        sixConfirmed: false,
+        allSelectConfirmed: false,
+        fourSameConfirmed: false,
+        gourdConfirmed: false,
+        miniStraightConfirmed: false,
+        bigStraightConfirmed: false,
+        yahtzeeConfirmed: false
       },
       {
         name: '玩家二',
@@ -47,25 +59,19 @@ Page({
         miniStraight: 0,
         bigStraight: 0,
         yahtzee: 0,
-        totalScore: 0
-      },
-      {
-        name: '玩家三',
-        one: 0,
-        two: 0,
-        three: 0,
-        four: 0,
-        five: 0,
-        six: 0,
-        littleSum: 0,
-        rewards: 0,
-        allSelect: 0,
-        fourSame: 0,
-        gourd: 0,
-        miniStraight: 0,
-        bigStraight: 0,
-        yahtzee: 0,
-        totalScore: 0
+        totalScore: 0,
+        oneConfirmed: false,
+        twoConfirmed: false,
+        threeConfirmed: false,
+        fourConfirmed: false,
+        fiveConfirmed: false,
+        sixConfirmed: false,
+        allSelectConfirmed: false,
+        fourSameConfirmed: false,
+        gourdConfirmed: false,
+        miniStraightConfirmed: false,
+        bigStraightConfirmed: false,
+        yahtzeeConfirmed: false
       }
     ],
     dict: {
@@ -85,20 +91,60 @@ Page({
     scoreList: [],
     curIndex: 0,
     activeNum: 0,
-    confirm: false
+    confirm: false,
+    currentPlayer: 0,
+    roundNumber: 1,
+    totalRounds: 12,
+    diceList: [0, 0, 0, 0, 0],
+    rolling: false,
+    hintMessage: '欢迎进入游戏，先投掷骰子再选择当前玩家得分项。'
   },
-  bindMultiPickerChange: function (e) {
-    // console.log('picker发送选择改变，携带值为', e.detail.value)
-    let multiSelect = e.detail.value.map(item => {
-      return item + 1
-    })
+  rollDice() {
+    if (this.data.rolling) return
+
     this.setData({
-      multiSelect: multiSelect,
-      multiIndex: e.detail.value,
+      rolling: true,
       confirm: false,
-      activeNum: 0
+      activeNum: 0,
+      diceList: [0, 0, 0, 0, 0],
+      hintMessage: '骰子投掷中，请稍候...'
+    })
+
+    const timerCount = 12
+    let count = 0
+
+    const interval = setInterval(() => {
+      const randomDice = Array.from({ length: 5 }, () => Math.floor(Math.random() * 6) + 1)
+      this.setData({
+        diceList: randomDice
+      })
+      count++
+      if (count >= timerCount) {
+        clearInterval(interval)
+        const finalDice = Array.from({ length: 5 }, () => Math.floor(Math.random() * 6) + 1)
+        this.setData({
+          rolling: false,
+          multiSelect: finalDice,
+          diceList: finalDice,
+          hintMessage: '骰子已掷出，请点击当前玩家对应得分格选择项，再次点击确认得分。'
+        })
+      }
+    }, 100)
+  },
+  // 切换到下一个玩家
+  nextPlayer() {
+    const nextPlayer = (this.data.currentPlayer + 1) % this.data.scoreList.length
+    const nextRound = nextPlayer === 0 ? this.data.roundNumber + 1 : this.data.roundNumber
+    this.setData({
+      currentPlayer: nextPlayer,
+      roundNumber: nextRound,
+      confirm: false,
+      activeNum: 0,
+      curIndex: nextPlayer,
+      hintMessage: `轮到${this.data.scoreList[nextPlayer].name}，请先投掷骰子。`
     })
   },
+
   // 固定点数累加
   numSum(e) {
     if(this.data.confirm || !this.data.multiSelect.length) return
@@ -106,6 +152,10 @@ Page({
       num,
       index
     } = e.target.dataset
+    if (index !== this.data.currentPlayer) return
+    const willConfirm = this.data.curIndex === index && this.data.activeNum === num
+    const label = `${num}点`
+    const playerName = this.data.scoreList[index].name
     if(this.data.curIndex != index || this.data.activeNum != num) {
       if(this.data.activeNum) {
         let score = 'scoreList[' + this.data.curIndex + '].' + this.data.dict[this.data.activeNum]
@@ -114,17 +164,22 @@ Page({
           activeNum: 0
         })
       }
-    }else {
       this.setData({
-        confirm: true
+        confirm: false,
+        curIndex: index,
+        activeNum: num,
+        hintMessage: `已选择${label}，再点击一次确认${playerName}得分`
+      })
+    } else {
+      const confirmedField = 'scoreList[' + index + '].' + this.data.dict[num] + 'Confirmed'
+      this.setData({
+        confirm: true,
+        hintMessage: `已确认${label}，正在切换到下一位玩家`,
+        [confirmedField]: true
       })
     }
-    this.setData({
-      curIndex: index,
-      activeNum: num
-    })
-    let numSum = this.data.multiSelect.reduce((pre, cur, index) => {
-      if (pre != num && index == 1) {
+    let numSum = this.data.multiSelect.reduce((pre, cur, idx) => {
+      if (pre != num && idx == 1) {
         pre = 0
       }
       if (cur == num) {
@@ -139,6 +194,9 @@ Page({
     })
     this.littleSum(this.data.scoreList[index], index)
     this.countTotal(this.data.scoreList[index],index)
+    if (willConfirm) {
+      this.nextPlayer()
+    }
   },
   // 小计
   littleSum(item, index) {
@@ -211,21 +269,36 @@ Page({
   countSame(e) {
     let {index, prop, num} = e.target.dataset
     if(this.data.confirm || !this.data.multiSelect.length) return
+    if (index !== this.data.currentPlayer) return
+    const willConfirm = this.data.curIndex === index && this.data.activeNum === num
+    const labelMap = {
+      7: '全选',
+      8: '四骰同花',
+      9: '葫芦',
+      12: '快艇'
+    }
+    const label = labelMap[num] || `${num}点`
+    const playerName = this.data.scoreList[index].name
     if(this.data.curIndex != index || this.data.activeNum != num) {
-      let score = 'scoreList[' + this.data.curIndex + '].' + this.data.dict[this.data.activeNum]
-        this.setData({
-          [score]: 0,
-          activeNum: 0
-      })
-    }else {
+      const score = this.data.activeNum ? 'scoreList[' + this.data.curIndex + '].' + this.data.dict[this.data.activeNum] : null
+      const update = {
+        confirm: false,
+        curIndex: index,
+        activeNum: num,
+        hintMessage: `已选择${label}，再点击一次确认${playerName}得分`
+      }
+      if (score) {
+        update[score] = 0
+      }
+      this.setData(update)
+    } else {
+      const confirmedField = 'scoreList[' + index + '].' + this.data.dict[num] + 'Confirmed'
       this.setData({
-        confirm: true
+        confirm: true,
+        hintMessage: `已确认${label}，正在切换到下一位玩家`,
+        [confirmedField]: true
       })
     }
-    this.setData({
-      curIndex: index,
-      activeNum: num
-    })
     let arr = [0, 0, 0, 0, 0, 0];
     let list = this.data.multiSelect
     for (let i = 0; i < list.length; i++) {
@@ -272,6 +345,9 @@ Page({
       default:
         this.allSum(index,'allSelect',true)
     }
+    if (willConfirm) {
+      this.nextPlayer()
+    }
   },
   // 四骰同花
   fourSame(e) {
@@ -295,21 +371,30 @@ Page({
   judgeStraight(e) {
     let {index, prop, num} = e.target.dataset
     if(this.data.confirm || !this.data.multiSelect.length) return
+    if (index !== this.data.currentPlayer) return
+    const willConfirm = this.data.curIndex === index && this.data.activeNum === num
+    const label = prop === 'miniStraight' ? '小顺' : '大顺'
+    const playerName = this.data.scoreList[index].name
     if(this.data.curIndex != index || this.data.activeNum != num) {
-      let score = 'scoreList[' + this.data.curIndex + '].' + this.data.dict[this.data.activeNum]
-        this.setData({
-          [score]: 0,
-          activeNum: 0
-      })
-    }else {
+      const score = this.data.activeNum ? 'scoreList[' + this.data.curIndex + '].' + this.data.dict[this.data.activeNum] : null
+      const update = {
+        confirm: false,
+        curIndex: index,
+        activeNum: num,
+        hintMessage: `已选择${label}，再点击一次确认${playerName}得分`
+      }
+      if (score) {
+        update[score] = 0
+      }
+      this.setData(update)
+    } else {
+      const confirmedField = 'scoreList[' + index + '].' + this.data.dict[num] + 'Confirmed'
       this.setData({
-        confirm: true
+        confirm: true,
+        hintMessage: `已确认${label}，正在切换到下一位玩家`,
+        [confirmedField]: true
       })
     }
-    this.setData({
-      curIndex: index,
-      activeNum: num
-    })
     let list = this.data.multiSelect.slice().sort()
     let count = 1
     list.reduce((pre,cur)=> {
@@ -336,6 +421,9 @@ Page({
     }
     this.littleSum(this.data.scoreList[index], index)
     this.countTotal(this.data.scoreList[index],index)
+    if (willConfirm) {
+      this.nextPlayer()
+    }
   },
   // 计算总点数
   countTotal(item,index) {
@@ -348,7 +436,15 @@ Page({
   reset() {
     this.setData(({
       confirm: false,
-      scoreList: JSON.parse(JSON.stringify(this.data.initList))
+      scoreList: JSON.parse(JSON.stringify(this.data.initList)),
+      currentPlayer: 0,
+      roundNumber: 1,
+      diceList: [0, 0, 0, 0, 0],
+      rolling: false,
+      multiSelect: [],
+      curIndex: 0,
+      activeNum: 0,
+      hintMessage: '已重置，先投掷骰子开始游戏。'
     }))
   },
 
